@@ -10,10 +10,13 @@ const Game = () => {
     const [history, setHistory] = useState([{squares: Array(9).fill(null)}]);
     const [xIsNext, setXIsNext] = useState(true);
 
+    //현재 진행중인 단계를 나타내는 stepNumber state를 추가
+    const [stepNumber, setStepNumber] = useState(0);
+
     //Board 컴포넌트에서 handleClick을 Game 컴포넌트로 옮겨옴
     const handleClick = (i) => {
         //불필요한 렌더링을 막기 위해 history 배열을 복사
-        const newHistory = [...history];
+        const newHistory = history.slice(0, stepNumber + 1);
         //복사한 배열 길이-1이 현재 게임판 상태
         const current = newHistory[newHistory.length - 1];
         //squares 배열을 복사
@@ -26,11 +29,20 @@ const Game = () => {
         squares[i] = xIsNext ? 'X' : 'O';
 
         setHistory(newHistory.concat([{squares: squares}]));
+        setStepNumber(newHistory.length);
         setXIsNext(!xIsNext);
     }
 
+    //jumpTo 메서드는 stepNumber를 업데이트
+    //xIsNext가 짝수일 때 true -> X
+    //xIsNext가 홀수일 때 false -> O
+    const jumpTo = (step) => {
+        setStepNumber(step);
+        setXIsNext((step % 2) === 0);
+    }
+
     const newhistory = history;
-    const current = newhistory[newhistory.length - 1];
+    const current = newhistory[stepNumber];
     const winner = calculateWinner(current.squares);
     let status;
     if(winner){
@@ -39,6 +51,17 @@ const Game = () => {
         status = `Next player: ${xIsNext?"X":"O"}`;
     }
 
+    const moves = history.map((step, move) => {
+        const desc = move ? 
+            `Go to move #${move}` : 
+            `Go to game start`;
+        return (
+            <li key={move}>
+                <button onClick={()=>jumpTo(move)}>{desc}</button>
+            </li>
+        );
+    });
+
     return (
         <div className="game">
             <div className="game-board">
@@ -46,7 +69,7 @@ const Game = () => {
             </div>
             <div className="game-info">
                 <div>{status}</div>
-                <div>{/* TODO */}</div>
+                <ol>{moves}</ol>
             </div>
         </div>
     );
