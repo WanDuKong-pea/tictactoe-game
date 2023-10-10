@@ -4,7 +4,14 @@ import Square from "./Square";
 
 
 const Board = () => {
+    //Square 컴포넌트에서 Board 컴포넌트로 state를 올리기 위해
+    //Board 컴포넌트에서 state를 생성하고 Square 컴포넌트에 props로 전달
+    //총 9개의 Square 컴포넌트를 렌더링하기 위해 9개의 인덱스를 가진 배열을 생성
     const [squares, setSquares] = useState(Array(9).fill(null));
+    //X와 O를 번갈아 가면서 표시하기 위해 state를 생성
+    //true면 X, false면 O
+    //handleClick 함수에서 X와 O를 번갈아 가면서 표시할 것
+    const [xIsNext, setXIsNext] = useState(true);
 
     const handleClick = (i) => {
         //square는 리액트의 state로 사용하기 위해 생성된 배열이기 떄문에
@@ -13,10 +20,15 @@ const Board = () => {
         //복사본을 생성하는 것이 어려워짐. 그래서 배열의 복사본을 생성하는 더 쉬운 방법인 
         //배열 리터럴 문법을 사용하는 것 => const squares = [...squares];
         const newSquares = [...squares];
-        newSquares[i] = 'X';
+        if(xIsNext){
+            newSquares[i] = 'X';
+        }else{
+            newSquares[i] = 'O';
+        }
         //squares:newSquares를 사용하지 않는 이유는
         //squares는 리액트의 state이기 때문에 직접 수정하면 안되기 때문
         setSquares(newSquares);
+        setXIsNext(!xIsNext);
     }
 
     const renderSquare = (i) => {
@@ -25,7 +37,7 @@ const Board = () => {
 
     return (
         <div>
-            <div className="status">Next player: X</div>
+            <div className="status">{`Next player: ${xIsNext?"X":"O"}`}</div>
             <div className="board-row">
                 {renderSquare(0)}
                 {renderSquare(1)}
