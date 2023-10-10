@@ -20,11 +20,16 @@ const Board = () => {
         //복사본을 생성하는 것이 어려워짐. 그래서 배열의 복사본을 생성하는 더 쉬운 방법인 
         //배열 리터럴 문법을 사용하는 것 => const squares = [...squares];
         const newSquares = [...squares];
-        if(xIsNext){
-            newSquares[i] = 'X';
-        }else{
-            newSquares[i] = 'O';
+
+        //누군가 승리하거나 Square가 이미 채워졌다면 Board의 handleClick 함수가 
+        //더 이상 실행되지 않도록 함
+        //squares[i]가 null이 아니면 이미 Square가 채워졌다는 의미.
+        if(calculateWinner(squares) || squares[i]){
+            return;
         }
+
+        //새로운 배열에 클릭한 플레이어의 값을 저장
+        newSquares[i] = xIsNext ? 'X' : 'O';
         //squares:newSquares를 사용하지 않는 이유는
         //squares는 리액트의 state이기 때문에 직접 수정하면 안되기 때문
         setSquares(newSquares);
@@ -35,9 +40,17 @@ const Board = () => {
         return <Square value={squares[i]} onClick={() => handleClick(i)}/>;
     }
 
+    const winner = calculateWinner(squares);
+    let status;
+    if(winner){
+        status = `Winner: ${winner}`;
+    }else{
+        status = `Next player: ${xIsNext?"X":"O"}`;
+    }
+
     return (
         <div>
-            <div className="status">{`Next player: ${xIsNext?"X":"O"}`}</div>
+            <div className="status">{status}</div>
             <div className="board-row">
                 {renderSquare(0)}
                 {renderSquare(1)}
@@ -56,5 +69,30 @@ const Board = () => {
         </div>
     );
 }
+
+ /**
+  * 게임의 승자를 확인하는 함수
+  * X,O 또는 null(무승부)을 반환
+  */
+ function calculateWinner(squares) {
+    const lines = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+    for (let i = 0; i < lines.length; i++) {
+      const [a, b, c] = lines[i];
+      if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+        return squares[a];
+      }
+    }
+  
+    return null;
+  }
 
 export default Board;
