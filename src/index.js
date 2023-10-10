@@ -5,6 +5,6 @@ import Game from './components/Game';
   
 const root = ReactDOM.createRoot(
   document.getElementById("root")
- );
+);
 
- root.render(<Game />);
+root.render(<Game />); 
